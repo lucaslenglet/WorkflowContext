@@ -1,34 +1,43 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace WorkflowContext.ConsoleApp;
 
 static class TimeSteps
 {
-    // Requires external dependencies via the IServiceProvider
-    public static async Task<UnitResult<TError>> GetDateUsingDependencies<TContext, TError>(TContext context)
-        where TContext : BaseContext<TError>, INow
+    public static async Task<UnitResult<TError>> GetDate<TValue, TError>(WorkflowContext<TValue, TError> context)
+        where TValue : IDate
     {
         // Fake I/O call to demonstrate that steps can be asynchronous
         await Task.CompletedTask;
 
         var timeProvider = context.Services.GetRequiredService<TimeProvider>();
 
-        context.Now = timeProvider.GetLocalNow().DateTime;
-
-        return UnitResult.Success<TError>();
-    }
-
-    // Has no external dependency
-    public static UnitResult<TError> GetDateWithoutServiceProvider<TError>(INow context)
-    {
-        context.Now = new DateTime(2024, 9, 11, 20, 00, 23);
+        context.Value.Date = timeProvider.GetLocalNow().DateTime;
 
         return UnitResult.Success<TError>();
     }
 }
 
-interface INow
+interface IDate
 {
-    public Maybe<DateTime> Now { get; set; }
+    public DateTime? Date { get; set; }
+}
+
+class LogSteps
+{
+    public static UnitResult<TError> LogContext<TValue, TError>(WorkflowContext<TValue, TError> context)
+    {
+        var logger = context.Services.GetRequiredService<ILogger<LogSteps>>();
+        var scopedService = context.Services.GetRequiredService<ScopedService>();
+
+        var json = JsonSerializer.Serialize(context);
+
+        logger.LogInformation("Scope : {ScopedId}, Context: {Context}",
+            scopedService.ScopeId, json);
+
+        return UnitResult.Success<TError>();
+    }
 }
