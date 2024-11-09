@@ -4,18 +4,13 @@ using System.Text.Json.Serialization;
 
 namespace WorkflowContext;
 
-public class WorkflowContext<TValue, TError>
+public class WorkflowContext<TData, TError>(IServiceProvider serviceProvider, TData data)
 {
-    public WorkflowContext(IServiceProvider serviceProvider, TValue value)
-    {
-        Services = serviceProvider;
-        Value = value;
-    }
-
     [JsonIgnore]
-    public IServiceProvider Services { get; internal set; }
+    public IServiceProvider Services { get; internal set; } = serviceProvider;
+
     [JsonIgnore]
     public UnitResult<TError> Result { get; internal set; } = UnitResult.Success<TError>();
 
-    public TValue Value { get; }
+    public TData Data { get; } = data;
 }

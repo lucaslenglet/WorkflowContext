@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace WorkflowContext;
 
-public static partial class BaseContext
+public static partial class WorkflowContext
 {
-    public static WorkflowContext<TValue, TError> IfError<TValue, TError>(this WorkflowContext<TValue, TError> context, Action<WorkflowContext<TValue, TError>> step)
+    public static WorkflowContext<TData, TError> IfError<TData, TError>(this WorkflowContext<TData, TError> context, Action<WorkflowContext<TData, TError>> step)
     {
         if (context.Result.IsSuccess)
         {
@@ -18,15 +18,15 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfError<TValue, TError>(
-        this Task<WorkflowContext<TValue, TError>> context, Action<WorkflowContext<TValue, TError>> step)
+    public static async Task<WorkflowContext<TData, TError>> IfError<TData, TError>(
+        this Task<WorkflowContext<TData, TError>> context, Action<WorkflowContext<TData, TError>> step)
     {
         var awaited = await context;
         return IfError(awaited, step);
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfError<TValue, TError>(
-        this WorkflowContext<TValue, TError> context, Func<WorkflowContext<TValue, TError>, Task> step)
+    public static async Task<WorkflowContext<TData, TError>> IfError<TData, TError>(
+        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, Task> step)
     {
         if (context.Result.IsSuccess)
         {
@@ -38,16 +38,16 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfError<TValue, TError>(
-        this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, Task> step)
+    public static async Task<WorkflowContext<TData, TError>> IfError<TData, TError>(
+        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task> step)
     {
         var awaited = await context;
         return await IfError(awaited, step);
     }
 
 
-    public static WorkflowContext<TValue, TError> IfError<TValue, TError>(
-        this WorkflowContext<TValue, TError> context, Func<WorkflowContext<TValue, TError>, UnitResult<TError>> step)
+    public static WorkflowContext<TData, TError> IfError<TData, TError>(
+        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, UnitResult<TError>> step)
     {
         if (context.Result.IsSuccess)
         {
@@ -59,15 +59,15 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfError<TValue, TError>(
-        this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, UnitResult<TError>> step)
+    public static async Task<WorkflowContext<TData, TError>> IfError<TData, TError>(
+        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, UnitResult<TError>> step)
     {
         var awaited = await context;
         return IfError(awaited, step);
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfError<TValue, TError>(
-        this WorkflowContext<TValue, TError> context, Func<WorkflowContext<TValue, TError>, Task<UnitResult<TError>>> step)
+    public static async Task<WorkflowContext<TData, TError>> IfError<TData, TError>(
+        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, Task<UnitResult<TError>>> step)
     {
         if (context.Result.IsSuccess)
         {
@@ -79,8 +79,8 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfError<TValue, TError>(
-        this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, Task<UnitResult<TError>>> step)
+    public static async Task<WorkflowContext<TData, TError>> IfError<TData, TError>(
+        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task<UnitResult<TError>>> step)
     {
         var awaited = await context;
         return await IfError(awaited, step);

@@ -37,7 +37,7 @@ internal class Demo(IServiceProvider serviceProvider)
 
         var message = context.Result
             .Match(
-                onSuccess: () => context.Value.Message,
+                onSuccess: () => context.Data.Message,
                 onFailure: error => error.Message);
 
         Console.WriteLine(message);
@@ -48,23 +48,23 @@ internal class Demo(IServiceProvider serviceProvider)
         // Fake I/O call to demonstrate that steps can be asynchronous at any point
         await Task.CompletedTask;
 
-        ctx.Value.Date = DateTime.Now;
+        ctx.Data.Date = DateTime.Now;
 
         return UnitResult.Success<Error>();
     }
 
     static UnitResult<Error> GetMessageLocal(WorkflowContext<DemoContext, Error> ctx)
     {
-        var parity = ctx.Value.Parity == Parity.Odd ? 1 : 0;
+        var parity = ctx.Data.Parity == Parity.Odd ? 1 : 0;
 
-        if (ctx.Value.Date!.Value.Second % 2 == parity)
+        if (ctx.Data.Date!.Value.Second % 2 == parity)
         {
             // Either work as long as IfSuccessTry is used and Error implements IFromException<Error>
-            throw new InvalidDataException($"Oops, {ctx.Value.Date.Value.Second} is not {ctx.Value.Parity}.");
+            throw new InvalidDataException($"Oops, {ctx.Data.Date.Value.Second} is not {ctx.Data.Parity}.");
             //return UnitResult.Failure(new Error($"Oops : {ctx.Value.Date.Value.Second}s"));
         }
 
-        ctx.Value.Message = $"The date is {ctx.Value.Date.Value:G}.";
+        ctx.Data.Message = $"The date is {ctx.Data.Date.Value:G}.";
 
         return UnitResult.Success<Error>();
     }

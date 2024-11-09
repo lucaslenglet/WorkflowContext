@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 
 namespace WorkflowContext;
 
-public static partial class BaseContext
+public static partial class WorkflowContext
 {
-    public static WorkflowContext<TValue, TError> IfSuccessScoped<TValue, TError>(
-        this WorkflowContext<TValue, TError> context, Func<WorkflowContext<TValue, TError>, WorkflowContext<TValue, TError>> action)
+    public static WorkflowContext<TData, TError> IfSuccessScoped<TData, TError>(
+        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, WorkflowContext<TData, TError>> action)
     {
         if (context.Result.IsFailure)
         {
@@ -28,15 +28,15 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessScoped<TValue, TError>(
-        this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, WorkflowContext<TValue, TError>> action)
+    public static async Task<WorkflowContext<TData, TError>> IfSuccessScoped<TData, TError>(
+        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, WorkflowContext<TData, TError>> action)
     {
         var awaited = await context;
         return IfSuccessScoped(awaited, action);
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessScoped<TValue, TError>(
-        this WorkflowContext<TValue, TError> context, Func<WorkflowContext<TValue, TError>, Task<WorkflowContext<TValue, TError>>> action)
+    public static async Task<WorkflowContext<TData, TError>> IfSuccessScoped<TData, TError>(
+        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, Task<WorkflowContext<TData, TError>>> action)
     {
         if (context.Result.IsFailure)
         {
@@ -57,15 +57,15 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessScoped<TValue, TError>(
-        this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, Task<WorkflowContext<TValue, TError>>> action)
+    public static async Task<WorkflowContext<TData, TError>> IfSuccessScoped<TData, TError>(
+        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task<WorkflowContext<TData, TError>>> action)
     {
         var awaited = await context;
         return await IfSuccessScoped(awaited, action);
     }
 
-    public static WorkflowContext<TValue, TError> IfSuccessScoped<TValue, TError>(
-        this WorkflowContext<TValue, TError> context, Action<WorkflowContext<TValue, TError>> action)
+    public static WorkflowContext<TData, TError> IfSuccessScoped<TData, TError>(
+        this WorkflowContext<TData, TError> context, Action<WorkflowContext<TData, TError>> action)
     {
         if (context.Result.IsFailure)
         {
@@ -86,15 +86,15 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessScoped<TValue, TError>(
-        this Task<WorkflowContext<TValue, TError>> context, Action<WorkflowContext<TValue, TError>> action)
+    public static async Task<WorkflowContext<TData, TError>> IfSuccessScoped<TData, TError>(
+        this Task<WorkflowContext<TData, TError>> context, Action<WorkflowContext<TData, TError>> action)
     {
         var ctx = await context;
         return IfSuccessScoped(ctx, action);
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessScoped<TValue, TError>(
-        this WorkflowContext<TValue, TError> context, Func<WorkflowContext<TValue, TError>, Task> action)
+    public static async Task<WorkflowContext<TData, TError>> IfSuccessScoped<TData, TError>(
+        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, Task> action)
     {
         if (context.Result.IsFailure)
         {
@@ -115,8 +115,8 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessScoped<TValue, TError>(
-        this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, Task> action)
+    public static async Task<WorkflowContext<TData, TError>> IfSuccessScoped<TData, TError>(
+        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task> action)
     {
         var ctx = await context;
         return await IfSuccessScoped(ctx, action);
