@@ -6,15 +6,10 @@ namespace WorkflowContext;
 
 public static partial class BaseContext
 {
-    public static WorkflowContext<TValue, TError> IfSuccessTry<TValue, TError>(
+    public static WorkflowContext<TValue, TError> ExecuteTry<TValue, TError>(
         this WorkflowContext<TValue, TError> context, Action<WorkflowContext<TValue, TError>> step)
         where TError : IFromException<TError>
     {
-        if (context.Result.IsFailure)
-        {
-            return context;
-        }
-
         try
         {
             step(context);
@@ -23,27 +18,21 @@ public static partial class BaseContext
         {
             context.Result = TError.FromException(ex);
         }
-
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessTry<TValue, TError>(
+    public static async Task<WorkflowContext<TValue, TError>> ExecuteTry<TValue, TError>(
         this Task<WorkflowContext<TValue, TError>> context, Action<WorkflowContext<TValue, TError>> step)
         where TError : IFromException<TError>
     {
         var awaited = await context;
-        return IfSuccessTry(awaited, step);
+        return ExecuteTry(awaited, step);
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessTry<TValue, TError>(
+    public static async Task<WorkflowContext<TValue, TError>> ExecuteTry<TValue, TError>(
         this WorkflowContext<TValue, TError> context, Func<WorkflowContext<TValue, TError>, Task> step)
         where TError : IFromException<TError>
     {
-        if (context.Result.IsFailure)
-        {
-            return context;
-        }
-
         try
         {
             await step(context);
@@ -56,24 +45,19 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessTry<TValue, TError>(
+    public static async Task<WorkflowContext<TValue, TError>> ExecuteTry<TValue, TError>(
         this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, Task> step)
         where TError : IFromException<TError>
     {
         var awaited = await context;
-        return await IfSuccessTry(awaited, step);
+        return await ExecuteTry(awaited, step);
     }
 
 
-    public static WorkflowContext<TValue, TError> IfSuccessTry<TValue, TError>(
+    public static WorkflowContext<TValue, TError> ExecuteTry<TValue, TError>(
         this WorkflowContext<TValue, TError> context, Func<WorkflowContext<TValue, TError>, UnitResult<TError>> step)
         where TError : IFromException<TError>
     {
-        if (context.Result.IsFailure)
-        {
-            return context;
-        }
-
         try
         {
             context.Result = step(context);
@@ -86,23 +70,18 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessTry<TValue, TError>(
+    public static async Task<WorkflowContext<TValue, TError>> ExecuteTry<TValue, TError>(
         this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, UnitResult<TError>> step)
         where TError : IFromException<TError>
     {
         var awaited = await context;
-        return IfSuccessTry(awaited, step);
+        return ExecuteTry(awaited, step);
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessTry<TValue, TError>(
+    public static async Task<WorkflowContext<TValue, TError>> ExecuteTry<TValue, TError>(
         this WorkflowContext<TValue, TError> context, Func<WorkflowContext<TValue, TError>, Task<UnitResult<TError>>> step)
         where TError : IFromException<TError>
     {
-        if (context.Result.IsFailure)
-        {
-            return context;
-        }
-
         try
         {
             context.Result = await step(context);
@@ -115,11 +94,11 @@ public static partial class BaseContext
         return context;
     }
 
-    public static async Task<WorkflowContext<TValue, TError>> IfSuccessTry<TValue, TError>(
+    public static async Task<WorkflowContext<TValue, TError>> ExecuteTry<TValue, TError>(
         this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, Task<UnitResult<TError>>> step)
         where TError : IFromException<TError>
     {
         var awaited = await context;
-        return await IfSuccessTry(awaited, step);
+        return await ExecuteTry(awaited, step);
     }
 }

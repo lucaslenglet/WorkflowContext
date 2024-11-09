@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace WorkflowContext
+namespace WorkflowContext;
+
+public interface IFromException<TError>
+    where TError : IFromException<TError>
 {
-    public interface IFromException<TError>
-        where TError : IFromException<TError>
-    {
-        public static abstract TError FromException(Exception exception);
-    }
+    public static abstract TError FromException(Exception exception);
 }

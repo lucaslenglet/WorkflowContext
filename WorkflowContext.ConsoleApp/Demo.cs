@@ -13,14 +13,18 @@ internal class Demo(IServiceProvider serviceProvider)
         });
 
         context = await context
-            // Local
-            //.IfSuccess(GetDateLocal)
-
             // Shared
             .Execute(LogSteps.LogContext)
 
+            // This method can thow, so ExecuteTry is required and Error must implement IFromException<Error>
+            .ExecuteTry(CanThrow)
+
             // Used to create a new Service Provider scope so that scoped services are reinstantiated when resolved inside this method
             .IfSuccessScoped(ctx => ctx
+                // Local
+                //.IfSuccess(GetDateLocal)
+
+                // Shared
                 .IfSuccess(TimeSteps.GetDate)
                 .IfSuccess(LogSteps.LogContext))
 
@@ -56,7 +60,7 @@ internal class Demo(IServiceProvider serviceProvider)
         if (ctx.Value.Date!.Value.Second % 2 == parity)
         {
             // Either work as long as IfSuccessTry is used and Error implements IFromException<Error>
-            throw new InvalidDataException($"Oops, {ctx.Value.Date.Value.Second} is not {ctx.Value.Parity}");
+            throw new InvalidDataException($"Oops, {ctx.Value.Date.Value.Second} is not {ctx.Value.Parity}.");
             //return UnitResult.Failure(new Error($"Oops : {ctx.Value.Date.Value.Second}s"));
         }
 
@@ -64,6 +68,16 @@ internal class Demo(IServiceProvider serviceProvider)
 
         return UnitResult.Success<Error>();
     }
+
+    static void CanThrow(WorkflowContext<DemoContext, Error> ctx)
+    {
+        if (Random.Shared.NextSingle() > 0.5)
+        {
+            throw new UnfortunateException();
+        }
+    }
+
+    class UnfortunateException() : Exception("That's unfortunate.");
 
     class DemoContext : TimeSteps.IDate
     {
