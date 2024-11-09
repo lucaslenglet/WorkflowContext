@@ -19,13 +19,14 @@ internal class Demo(IServiceProvider serviceProvider)
             // Shared
             .Execute(LogSteps.LogContext)
 
-            // Used to create a new Service Provider scope so that scoped services are reinstantiated when resolved
+            // Used to create a new Service Provider scope so that scoped services are reinstantiated when resolved inside this method
             .IfSuccessScoped(ctx => ctx
                 .IfSuccess(TimeSteps.GetDate)
                 .IfSuccess(LogSteps.LogContext))
 
             // Local
-            .IfSuccess(GetMessageLocal)
+            // This method can thow, so IfSuccessTry is required and Error must implement IFromException<Error>
+            .IfSuccessTry(GetMessageLocal)
 
             // Shared
             .IfSuccess(LogSteps.LogContext);
@@ -40,7 +41,7 @@ internal class Demo(IServiceProvider serviceProvider)
 
     static async Task<UnitResult<Error>> GetDateLocal(WorkflowContext<DemoContext, Error> ctx)
     {
-        // Fake I/O call to demonstrate that steps can be asynchronous
+        // Fake I/O call to demonstrate that steps can be asynchronous at any point
         await Task.CompletedTask;
 
         ctx.Value.Date = DateTime.Now;
@@ -54,7 +55,9 @@ internal class Demo(IServiceProvider serviceProvider)
 
         if (ctx.Value.Date!.Value.Second % 2 == parity)
         {
-            return UnitResult.Failure(new Error($"Oops : {ctx.Value.Date.Value.Second}s"));
+            // Either work as long as IfSuccessTry is used and Error implements IFromException<Error>
+            throw new InvalidDataException($"Oops, {ctx.Value.Date.Value.Second} is not {ctx.Value.Parity}");
+            //return UnitResult.Failure(new Error($"Oops : {ctx.Value.Date.Value.Second}s"));
         }
 
         ctx.Value.Message = $"The date is {ctx.Value.Date.Value:G}.";
@@ -62,7 +65,7 @@ internal class Demo(IServiceProvider serviceProvider)
         return UnitResult.Success<Error>();
     }
 
-    class DemoContext : IDate
+    class DemoContext : TimeSteps.IDate
     {
         public required Parity Parity { get; init; }
 
@@ -73,5 +76,9 @@ internal class Demo(IServiceProvider serviceProvider)
 
     enum Parity { Pair, Odd }
 
-    record Error(string Message);
+    record Error(string Message) : IFromException<Error>
+    {
+        public static Error FromException(Exception exception) =>
+            new(exception.Message);
+    }
 }

@@ -18,7 +18,7 @@ namespace WorkflowContext
             this Task<WorkflowContext<TValue, TError>> context, Action<WorkflowContext<TValue, TError>> step)
         {
             var awaited = await context;
-            return Execute<TValue, TError>(awaited, step);
+            return Execute(awaited, step);
         }
 
         public static async Task<WorkflowContext<TValue, TError>> Execute<TValue, TError>(
@@ -33,7 +33,7 @@ namespace WorkflowContext
             this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, Task> step)
         {
             var awaited = await context;
-            return await Execute<TValue, TError>(awaited, step);
+            return await Execute(awaited, step);
         }
 
 

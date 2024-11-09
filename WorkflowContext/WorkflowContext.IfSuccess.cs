@@ -23,7 +23,7 @@ namespace WorkflowContext
             this Task<WorkflowContext<TValue, TError>> context, Action<WorkflowContext<TValue, TError>> step)
         {
             var awaited = await context;
-            return IfSuccess<TValue, TError>(awaited, step);
+            return IfSuccess(awaited, step);
         }
 
         public static async Task<WorkflowContext<TValue, TError>> IfSuccess<TValue, TError>(
@@ -43,7 +43,7 @@ namespace WorkflowContext
             this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, Task> step)
         {
             var awaited = await context;
-            return await IfSuccess<TValue, TError>(awaited, step);
+            return await IfSuccess(awaited, step);
         }
 
 

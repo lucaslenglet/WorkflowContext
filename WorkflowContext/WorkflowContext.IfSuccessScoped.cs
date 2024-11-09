@@ -32,7 +32,7 @@ namespace WorkflowContext
             this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, WorkflowContext<TValue, TError>> action)
         {
             var awaited = await context;
-            return IfSuccessScoped<TValue, TError>(awaited, action);
+            return IfSuccessScoped(awaited, action);
         }
 
         public static async Task<WorkflowContext<TValue, TError>> IfSuccessScoped<TValue, TError>(
@@ -61,7 +61,7 @@ namespace WorkflowContext
             this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, Task<WorkflowContext<TValue, TError>>> action)
         {
             var awaited = await context;
-            return await IfSuccessScoped<TValue, TError>(awaited, action);
+            return await IfSuccessScoped(awaited, action);
         }
 
         public static WorkflowContext<TValue, TError> IfSuccessScoped<TValue, TError>(
@@ -90,7 +90,7 @@ namespace WorkflowContext
             this Task<WorkflowContext<TValue, TError>> context, Action<WorkflowContext<TValue, TError>> action)
         {
             var ctx = await context;
-            return IfSuccessScoped<TValue, TError>(ctx, action);
+            return IfSuccessScoped(ctx, action);
         }
 
         public static async Task<WorkflowContext<TValue, TError>> IfSuccessScoped<TValue, TError>(
@@ -119,7 +119,7 @@ namespace WorkflowContext
             this Task<WorkflowContext<TValue, TError>> context, Func<WorkflowContext<TValue, TError>, Task> action)
         {
             var ctx = await context;
-            return await IfSuccessScoped<TValue, TError>(ctx, action);
+            return await IfSuccessScoped(ctx, action);
         }
     }
 }

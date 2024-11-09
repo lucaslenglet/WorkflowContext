@@ -10,7 +10,7 @@ static class TimeSteps
     public static async Task<UnitResult<TError>> GetDate<TValue, TError>(WorkflowContext<TValue, TError> context)
         where TValue : IDate
     {
-        // Fake I/O call to demonstrate that steps can be asynchronous
+        // Fake I/O call to demonstrate that steps can be asynchronous at any point
         await Task.CompletedTask;
 
         var timeProvider = context.Services.GetRequiredService<TimeProvider>();
@@ -19,11 +19,11 @@ static class TimeSteps
 
         return UnitResult.Success<TError>();
     }
-}
 
-interface IDate
-{
-    public DateTime? Date { get; set; }
+    public interface IDate
+    {
+        public DateTime? Date { get; set; }
+    }
 }
 
 class LogSteps
