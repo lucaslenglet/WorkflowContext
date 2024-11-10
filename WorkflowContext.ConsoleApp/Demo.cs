@@ -16,6 +16,8 @@ internal class Demo(IServiceProvider serviceProvider)
             // Shared
             .Execute(LogSteps.LogContext)
 
+            //.IfSuccess(ctx => ErrorSteps.IWillFailSaying(ctx, "Sorry, i had to fail..."))
+
             // This method can thow, so ExecuteTry is required and Error must implement IFromException<Error>
             .ExecuteTry(CanThrow)
 
@@ -90,9 +92,12 @@ internal class Demo(IServiceProvider serviceProvider)
 
     enum Parity { Pair, Odd }
 
-    record Error(string Message) : IFromException<Error>
+    record Error(string Message) : IFromException<Error>, IFrom<string, Error>
     {
-        public static Error FromException(Exception exception) =>
+        public static Error From(Exception exception) =>
             new(exception.Message);
+
+        public static Error From(string source) =>
+            new(source);
     }
 }

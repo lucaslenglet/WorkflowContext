@@ -2,8 +2,5 @@
 
 namespace WorkflowContext;
 
-public interface IFromException<TError>
-    where TError : IFromException<TError>
-{
-    public static abstract TError FromException(Exception exception);
-}
+public interface IFromException<TTo> : IFrom<Exception, TTo>
+    where TTo : IFrom<Exception, TTo>;

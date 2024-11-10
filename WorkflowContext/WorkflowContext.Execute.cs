@@ -16,8 +16,7 @@ public static partial class WorkflowContext
     public static async Task<WorkflowContext<TData, TError>> Execute<TData, TError>(
         this Task<WorkflowContext<TData, TError>> context, Action<WorkflowContext<TData, TError>> step)
     {
-        var awaited = await context;
-        return Execute(awaited, step);
+        return (await context).Execute(step);
     }
 
     public static async Task<WorkflowContext<TData, TError>> Execute<TData, TError>(
@@ -30,8 +29,7 @@ public static partial class WorkflowContext
     public static async Task<WorkflowContext<TData, TError>> Execute<TData, TError>(
         this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task> step)
     {
-        var awaited = await context;
-        return await Execute(awaited, step);
+        return await (await context).Execute(step);
     }
 
 
@@ -45,8 +43,7 @@ public static partial class WorkflowContext
     public static async Task<WorkflowContext<TData, TError>> Execute<TData, TError>(
         this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, UnitResult<TError>> step)
     {
-        var awaited = await context;
-        return Execute(awaited, step);
+        return (await context).Execute(step);
     }
 
     public static async Task<WorkflowContext<TData, TError>> Execute<TData, TError>(
@@ -59,7 +56,6 @@ public static partial class WorkflowContext
     public static async Task<WorkflowContext<TData, TError>> Execute<TData, TError>(
         this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task<UnitResult<TError>>> step)
     {
-        var awaited = await context;
-        return await Execute(awaited, step);
+        return await (await context).Execute(step);
     }
 }

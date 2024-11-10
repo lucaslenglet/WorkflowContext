@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
@@ -23,11 +24,11 @@ static class TimeSteps
     }
 }
 
-class LogSteps
+static class LogSteps
 {
     public static void LogContext<TData, TError>(WorkflowContext<TData, TError> context)
     {
-        var logger = context.Services.GetRequiredService<ILogger<LogSteps>>();
+        var logger = context.Services.GetRequiredService<ILogger<WorkflowContext<TData, TError>>>();
         var scopedService = context.Services.GetRequiredService<ScopedService>();
 
         var json = JsonSerializer.Serialize(context);
@@ -35,4 +36,10 @@ class LogSteps
         logger.LogInformation("Scope : {ScopedId}, Context: {Context}",
             scopedService.ScopeId, json);
     }
+}
+
+static class ErrorSteps
+{
+    public static UnitResult<string> IWillFailSaying<TData, TError>(WorkflowContext<TData, TError> context, string message) =>
+        UnitResult.Failure(message);
 }
