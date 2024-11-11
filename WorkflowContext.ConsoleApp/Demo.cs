@@ -2,17 +2,54 @@
 
 namespace WorkflowContext.ConsoleApp;
 
-internal class Demo(IServiceProvider serviceProvider)
+public class Demo(
+    IServiceProvider serviceProvider,
+    IWorkflowContextBuilder workflowContextBuilder)
 {
+    class DemoContext : TimeSteps.IDate
+    {
+        public required Parity Parity { get; init; }
+        public DateTime? Date { get; set; }
+        public string? Message { get; set; }
+        public IEnumerable<int> Integers { get; set; } = Enumerable.Range(0, 10);
+    }
+
+    enum Parity { Pair, Odd }
+
+    public record Error(string Message) : IFromException<Error>, IFrom<string, Error>
+    {
+        public static Error From(Exception exception) => new(exception.Message);
+        public static Error From(string source) => new(source);
+    }
+
     public async Task StartAsync()
     {
-        // Initiate context by yourself
-        var context = new WorkflowContext<DemoContext, Error>(serviceProvider, new DemoContext
+        // Initiate the context by yourself
+        _ = new WorkflowContext<DemoContext, Error>(serviceProvider, new DemoContext
         {
             Parity = Parity.Odd
         });
 
-        context = await context
+        // Or initiate the context using the static WorkflowContextBuilder
+        _ = WorkflowContextBuilder
+            .Create(serviceProvider)
+            .WithError<Error>()
+            .WithData(new DemoContext
+            {
+                Parity = Parity.Odd,
+            })
+            .Build();
+
+        // Or initiate the context using an injected WorkflowContextBuilder
+        var (data, result) = await workflowContextBuilder
+            .WithError<Error>()
+            .WithData(new DemoContext
+            {
+                Parity = Parity.Odd,
+            })
+            .Build()
+
+
             // Shared
             .Execute(LogSteps.LogContext)
 
@@ -22,10 +59,15 @@ internal class Demo(IServiceProvider serviceProvider)
             // This method can thow, so ExecuteTry is required and Error must implement IFromException<Error>
             .ExecuteTry(CanThrow)
 
+            .IfSuccess(ctx => ctx.Data.Integers
+                .Select(i => i * 2)
+                .Iter(i =>
+                    Console.WriteLine("Integer was : {0}", i)))
+
             // Used to create a new Service Provider scope so that scoped services are reinstantiated when resolved inside this method
             .IfSuccessScoped(ctx => ctx
                 // Local
-                //.IfSuccess(GetDateLocal)
+                .IfSuccess(GetDateLocal)
 
                 // Shared
                 .IfSuccess(TimeSteps.GetDate)
@@ -38,9 +80,9 @@ internal class Demo(IServiceProvider serviceProvider)
             // Shared
             .IfSuccess(LogSteps.LogContext);
 
-        var message = context.Result
+        var message = result
             .Match(
-                onSuccess: () => context.Data.Message,
+                onSuccess: () => data.Message,
                 onFailure: error => error.Message);
 
         Console.WriteLine(message);
@@ -81,24 +123,4 @@ internal class Demo(IServiceProvider serviceProvider)
     }
 
     class UnfortunateException() : Exception("That's unfortunate.");
-
-    class DemoContext : TimeSteps.IDate
-    {
-        public required Parity Parity { get; init; }
-
-        public DateTime? Date { get; set; }
-
-        public string? Message { get; set; }
-    }
-
-    enum Parity { Pair, Odd }
-
-    record Error(string Message) : IFromException<Error>, IFrom<string, Error>
-    {
-        public static Error From(Exception exception) =>
-            new(exception.Message);
-
-        public static Error From(string source) =>
-            new(source);
-    }
 }

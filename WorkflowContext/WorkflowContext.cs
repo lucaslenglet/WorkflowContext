@@ -13,4 +13,16 @@ public class WorkflowContext<TData, TError>(IServiceProvider serviceProvider, TD
     public UnitResult<TError> Result { get; internal set; } = UnitResult.Success<TError>();
 
     public TData Data { get; } = data;
+
+    public void Deconstruct(out TData data, out UnitResult<TError> result)
+    {
+        data = Data;
+        result = Result;
+    }
+
+    public void Deconstruct(out TData data, out UnitResult<TError> result, out IServiceProvider serviceProvider)
+    {
+        Deconstruct(out data, out result);
+        serviceProvider = Services;
+    }
 }
