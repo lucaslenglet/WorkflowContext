@@ -13,3 +13,9 @@ await new ServiceCollection()
     .BuildServiceProvider()
     .GetRequiredService<Demo>()
     .StartAsync();
+
+
+// TODOS :
+// - ExecuteMap()
+// - Create child context from any context (scoped ?)
+// - Add ability to inject middlewares inside context that wills automatically be executed at the right time between steps
