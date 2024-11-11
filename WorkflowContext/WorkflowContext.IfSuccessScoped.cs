@@ -7,7 +7,7 @@ namespace WorkflowContext;
 public static partial class WorkflowContext
 {
     public static WorkflowContext<TData, TError> IfSuccessScoped<TData, TError>(
-        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, WorkflowContext<TData, TError>> action)
+        this WorkflowContext<TData, TError> context, WorkflowPlanner<TData, TError> action)
     {
         return context.IfSuccessDoInternal(ctx =>
         {
@@ -27,13 +27,13 @@ public static partial class WorkflowContext
     }
 
     public static async Task<WorkflowContext<TData, TError>> IfSuccessScoped<TData, TError>(
-        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, WorkflowContext<TData, TError>> action)
+        this Task<WorkflowContext<TData, TError>> context, WorkflowPlanner<TData, TError> action)
     {
         return (await context).IfSuccessScoped(action);
     }
 
     public static async Task<WorkflowContext<TData, TError>> IfSuccessScoped<TData, TError>(
-        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, Task<WorkflowContext<TData, TError>>> action)
+        this WorkflowContext<TData, TError> context, WorkflowPlannerAsync<TData, TError> action)
     {
         return await context.IfSuccessDoInternal(async ctx =>
         {
@@ -53,7 +53,7 @@ public static partial class WorkflowContext
     }
 
     public static async Task<WorkflowContext<TData, TError>> IfSuccessScoped<TData, TError>(
-        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task<WorkflowContext<TData, TError>>> action)
+        this Task<WorkflowContext<TData, TError>> context, WorkflowPlannerAsync<TData, TError> action)
     {
         return await (await context).IfSuccessScoped(action);
     }

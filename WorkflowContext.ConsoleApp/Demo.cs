@@ -22,34 +22,9 @@ public class Demo(
         public static Error From(string source) => new(source);
     }
 
-    public async Task StartAsync()
+    abstract class DemoPlanner : IWorkflowContextAsync<DemoContext, Error>
     {
-        // Initiate the context by yourself
-        _ = new WorkflowContext<DemoContext, Error>(serviceProvider, new DemoContext
-        {
-            Parity = Parity.Odd
-        });
-
-        // Or initiate the context using the static WorkflowContextBuilder
-        _ = WorkflowContextBuilder
-            .Create(serviceProvider)
-            .WithError<Error>()
-            .WithData(new DemoContext
-            {
-                Parity = Parity.Odd,
-            })
-            .Build();
-
-        // Or initiate the context using an injected WorkflowContextBuilder
-        var (data, result) = await workflowContextBuilder
-            .WithError<Error>()
-            .WithData(new DemoContext
-            {
-                Parity = Parity.Odd,
-            })
-            .Build()
-
-
+        public static WorkflowPlannerAsync<DemoContext, Error> Plan => static ctx => ctx
             // Shared
             .Execute(LogSteps.LogContext)
 
@@ -79,6 +54,36 @@ public class Demo(
 
             // Shared
             .IfSuccess(LogSteps.LogContext);
+    }
+
+    public async Task StartAsync()
+    {
+        // Initiate the context by yourself
+        _ = new WorkflowContext<DemoContext, Error>(serviceProvider, new DemoContext
+        {
+            Parity = Parity.Odd
+        });
+
+        // Or initiate the context using the static WorkflowContextBuilder
+        _ = WorkflowContextBuilder
+            .Create(serviceProvider)
+            .WithError<Error>()
+            .WithData(new DemoContext
+            {
+                Parity = Parity.Odd,
+            })
+            .Build();
+
+        // Or initiate the context using an injected WorkflowContextBuilder
+        var (data, result) = await workflowContextBuilder
+            .WithError<Error>()
+            .WithData(new DemoContext
+            {
+                Parity = Parity.Odd,
+            })
+            .Build()
+
+            .Execute(DemoPlanner.Plan);
 
         var message = result
             .Match(
@@ -116,7 +121,7 @@ public class Demo(
 
     static void CanThrow(WorkflowContext<DemoContext, Error> ctx)
     {
-        if (Random.Shared.NextSingle() > 0.5)
+        if (Random.Shared.NextSingle() > 0.9)
         {
             throw new UnfortunateException();
         }

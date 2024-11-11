@@ -16,6 +16,8 @@ await new ServiceCollection()
 
 
 // TODOS :
-// - ExecuteMap()
-// - Create child context from any context (scoped ?)
-// - Add ability to inject middlewares inside context that wills automatically be executed at the right time between steps
+// - [ ] ExecuteMap()
+// - [ ] Create child context from any context (scoped ?)
+// - [ ] Add ability to inject middlewares inside context that wills automatically be executed at the right time between steps
+// - [ ] Replace UnitResult<> with some kind of WorkflowResult or WorkflowState
+// - [X] Add some king of workflow planner
