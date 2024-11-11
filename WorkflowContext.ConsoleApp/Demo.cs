@@ -16,6 +16,7 @@ internal class Demo(IServiceProvider serviceProvider)
             // Shared
             .Execute(LogSteps.LogContext)
 
+            // This method always returns an error UnitResult<string>, but this is automatically mapped because Error implements IFrom<string, Error>
             //.IfSuccess(ctx => ErrorSteps.IWillFailSaying(ctx, "Sorry, i had to fail..."))
 
             // This method can thow, so ExecuteTry is required and Error must implement IFromException<Error>

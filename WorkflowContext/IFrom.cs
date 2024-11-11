@@ -1,7 +1,8 @@
 ﻿namespace WorkflowContext;
 
-public interface IFrom<TFrom, TTo>
-    where TTo : IFrom<TFrom, TTo>
+// Mimic Rust's From trait behavior (https://doc.rust-lang.org/std/convert/trait.From.html)
+public interface IFrom<TFrom, TSelf>
+    where TSelf : IFrom<TFrom, TSelf>
 {
-    public static abstract TTo From(TFrom source);
+    public static abstract TSelf From(TFrom source);
 }

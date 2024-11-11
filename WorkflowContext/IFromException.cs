@@ -2,5 +2,5 @@
 
 namespace WorkflowContext;
 
-public interface IFromException<TTo> : IFrom<Exception, TTo>
-    where TTo : IFrom<Exception, TTo>;
+public interface IFromException<TSelf> : IFrom<Exception, TSelf>
+    where TSelf : IFrom<Exception, TSelf>;

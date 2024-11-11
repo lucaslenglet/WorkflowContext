@@ -58,4 +58,35 @@ public static partial class WorkflowContext
     {
         return await (await context).Execute(step);
     }
+
+    public static WorkflowContext<TData, TError> Execute<TData, TError, TError2>(
+        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, UnitResult<TError2>> step)
+        where TError : IFrom<TError2, TError>
+    {
+        context.Result = step(context).MapError(TError.From);
+        return context;
+    }
+
+    public static async Task<WorkflowContext<TData, TError>> Execute<TData, TError, TError2>(
+        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, UnitResult<TError2>> step)
+        where TError : IFrom<TError2, TError>
+    {
+        return (await context).Execute(step);
+    }
+
+    public static async Task<WorkflowContext<TData, TError>> Execute<TData, TError, TError2>(
+        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, Task<UnitResult<TError2>>> step)
+        where TError : IFrom<TError2, TError>
+    {
+        var result = await step(context);
+        context.Result = result.MapError(TError.From);
+        return context;
+    }
+
+    public static async Task<WorkflowContext<TData, TError>> Execute<TData, TError, TError2>(
+        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task<UnitResult<TError2>>> step)
+        where TError : IFrom<TError2, TError>
+    {
+        return await (await context).Execute(step);
+    }
 }

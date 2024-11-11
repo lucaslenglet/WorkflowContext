@@ -95,8 +95,7 @@ public static partial class WorkflowContext
         this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task<UnitResult<TError>>> step)
         where TError : IFromException<TError>
     {
-        var awaited = await context;
-        return await ExecuteTry(awaited, step);
+        return await (await context).ExecuteTry(step);
     }
 
 
