@@ -1,26 +1,25 @@
-﻿using CSharpFunctionalExtensions;
-using System;
+﻿using System;
 using System.Text.Json.Serialization;
 
 namespace WorkflowContext;
 
-public class WorkflowContext<TData, TError>(IServiceProvider serviceProvider, TData data)
+public partial class WorkflowContext<TData, TError>(IServiceProvider serviceProvider, TData data)
 {
     [JsonIgnore]
     public IServiceProvider Services { get; internal set; } = serviceProvider;
 
     [JsonIgnore]
-    public UnitResult<TError> Result { get; internal set; } = UnitResult.Success<TError>();
+    public WorkflowResult<TError> Result { get; internal set; } = WorkflowResult.Success<TError>();
 
     public TData Data { get; } = data;
 
-    public void Deconstruct(out TData data, out UnitResult<TError> result)
+    public void Deconstruct(out TData data, out WorkflowResult<TError> result)
     {
         data = Data;
         result = Result;
     }
 
-    public void Deconstruct(out TData data, out UnitResult<TError> result, out IServiceProvider serviceProvider)
+    public void Deconstruct(out TData data, out WorkflowResult<TError> result, out IServiceProvider serviceProvider)
     {
         Deconstruct(out data, out result);
         serviceProvider = Services;

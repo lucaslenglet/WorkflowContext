@@ -1,12 +1,10 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace WorkflowContext.ConsoleApp;
+﻿namespace WorkflowContext.ConsoleApp;
 
 public class Demo(
     IServiceProvider serviceProvider,
     IWorkflowContextBuilder workflowContextBuilder)
 {
-    class DemoContext : TimeSteps.IDate
+    class Context : TimeSteps.IDate
     {
         public required Parity Parity { get; init; }
         public DateTime? Date { get; set; }
@@ -22,9 +20,9 @@ public class Demo(
         public static Error From(string source) => new(source);
     }
 
-    abstract class DemoPlanner : IWorkflowContextAsync<DemoContext, Error>
+    abstract class Planner : IWorkflowContextAsync<Context, Error>
     {
-        public static WorkflowPlannerAsync<DemoContext, Error> Plan => static ctx => ctx
+        public static WorkflowPlannerAsync<Context, Error> Plan => static ctx => ctx
             // Shared
             .Execute(LogSteps.LogContext)
 
@@ -34,10 +32,11 @@ public class Demo(
             // This method can thow, so ExecuteTry is required and Error must implement IFromException<Error>
             .ExecuteTry(CanThrow)
 
-            .IfSuccess(ctx => ctx.Data.Integers
-                .Select(i => i * 2)
-                .Iter(i =>
-                    Console.WriteLine("Integer was : {0}", i)))
+            .IfSuccess(ctx => (ctx.Data.Integers ?? [])
+                .Iter(i => ctx
+                    .ExecuteMap(_ => i * 2) // You can change workflow Data type
+                    .MapError(e => "") // You can also change workflow  type
+                    .ExecuteScoped(c => Console.WriteLine("Integer was : {0}", c.Data))))
 
             // Used to create a new Service Provider scope so that scoped services are reinstantiated when resolved inside this method
             .IfSuccessScoped(ctx => ctx
@@ -54,12 +53,15 @@ public class Demo(
 
             // Shared
             .IfSuccess(LogSteps.LogContext);
+
+        public static WorkflowPlanner<int, Error> Plan2 => static ctx => ctx
+            .Execute(c => Console.WriteLine("Integer was : {0}", c.Data));
     }
 
     public async Task StartAsync()
     {
         // Initiate the context by yourself
-        _ = new WorkflowContext<DemoContext, Error>(serviceProvider, new DemoContext
+        _ = new WorkflowContext<Context, Error>(serviceProvider, new Context
         {
             Parity = Parity.Odd
         });
@@ -68,7 +70,7 @@ public class Demo(
         _ = WorkflowContextBuilder
             .Create(serviceProvider)
             .WithError<Error>()
-            .WithData(new DemoContext
+            .WithData(new Context
             {
                 Parity = Parity.Odd,
             })
@@ -77,13 +79,13 @@ public class Demo(
         // Or initiate the context using an injected WorkflowContextBuilder
         var (data, result) = await workflowContextBuilder
             .WithError<Error>()
-            .WithData(new DemoContext
+            .WithData(new Context
             {
                 Parity = Parity.Odd,
             })
             .Build()
 
-            .Execute(DemoPlanner.Plan);
+            .Execute(Planner.Plan);
 
         var message = result
             .Match(
@@ -93,17 +95,17 @@ public class Demo(
         Console.WriteLine(message);
     }
 
-    static async Task<UnitResult<Error>> GetDateLocal(WorkflowContext<DemoContext, Error> ctx)
+    static async Task<WorkflowResult<Error>> GetDateLocal(WorkflowContext<Context, Error> ctx)
     {
         // Fake I/O call to demonstrate that steps can be asynchronous at any point
         await Task.CompletedTask;
 
         ctx.Data.Date = DateTime.Now;
 
-        return UnitResult.Success<Error>();
+        return WorkflowResult.Success<Error>();
     }
 
-    static UnitResult<Error> GetMessageLocal(WorkflowContext<DemoContext, Error> ctx)
+    static WorkflowResult<Error> GetMessageLocal(WorkflowContext<Context, Error> ctx)
     {
         var parity = ctx.Data.Parity == Parity.Odd ? 1 : 0;
 
@@ -116,10 +118,10 @@ public class Demo(
 
         ctx.Data.Message = $"The date is {ctx.Data.Date.Value:G}.";
 
-        return UnitResult.Success<Error>();
+        return WorkflowResult.Success<Error>();
     }
 
-    static void CanThrow(WorkflowContext<DemoContext, Error> ctx)
+    static void CanThrow(WorkflowContext<Context, Error> ctx)
     {
         if (Random.Shared.NextSingle() > 0.9)
         {

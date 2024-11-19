@@ -5,7 +5,7 @@ namespace WorkflowContext;
 public static partial class WorkflowContext
 {
     public static WorkflowContext<TData, TError> Execute<TData, TError>(
-    this WorkflowContext<TData, TError> context, WorkflowPlanner<TData, TError> planner)
+        this WorkflowContext<TData, TError> context, WorkflowPlanner<TData, TError> planner)
     {
         return planner(context);
     }

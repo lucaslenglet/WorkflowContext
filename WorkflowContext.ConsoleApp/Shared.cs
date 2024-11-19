@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
@@ -40,6 +39,6 @@ static class LogSteps
 
 static class ErrorSteps
 {
-    public static UnitResult<string> IWillFailSaying<TData, TError>(WorkflowContext<TData, TError> context, string message) =>
-        UnitResult.Failure(message);
+    public static WorkflowResult<string> IWillFailSaying<TData, TError>(WorkflowContext<TData, TError> context, string message) =>
+        WorkflowResult.Failure(message);
 }
