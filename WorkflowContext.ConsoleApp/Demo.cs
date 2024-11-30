@@ -9,53 +9,14 @@ public class Demo(
         public required Parity Parity { get; init; }
         public DateTime? Date { get; set; }
         public string? Message { get; set; }
-        public IEnumerable<int> Integers { get; set; } = Enumerable.Range(0, 10);
     }
 
     enum Parity { Pair, Odd }
 
-    public record Error(string Message) : IFromException<Error>, IFrom<string, Error>
+    record Error(string Message) : IFromException<Error>, IFrom<string, Error>
     {
         public static Error From(Exception exception) => new(exception.Message);
         public static Error From(string source) => new(source);
-    }
-
-    abstract class Planner : IWorkflowContextAsync<Context, Error>
-    {
-        public static WorkflowPlannerAsync<Context, Error> Plan => static ctx => ctx
-            // Shared
-            .Execute(LogSteps.LogContext)
-
-            // This method always returns an error UnitResult<string>, but this is automatically mapped because Error implements IFrom<string, Error>
-            //.IfSuccess(ctx => ErrorSteps.IWillFailSaying(ctx, "Sorry, i had to fail..."))
-
-            // This method can thow, so ExecuteTry is required and Error must implement IFromException<Error>
-            .ExecuteTry(CanThrow)
-
-            .IfSuccess(ctx => (ctx.Data.Integers ?? [])
-                .Iter(i => ctx
-                    .ExecuteMap(_ => i * 2) // You can change workflow Data type
-                    .MapError(e => "") // You can also change workflow  type
-                    .ExecuteScoped(c => Console.WriteLine("Integer was : {0}", c.Data))))
-
-            // Used to create a new Service Provider scope so that scoped services are reinstantiated when resolved inside this method
-            .IfSuccessScoped(ctx => ctx
-                // Local
-                .IfSuccess(GetDateLocal)
-
-                // Shared
-                .IfSuccess(TimeSteps.GetDate)
-                .IfSuccess(LogSteps.LogContext))
-
-            // Local
-            // This method can thow, so IfSuccessTry is required and Error must implement IFromException<Error>
-            .IfSuccessTry(GetMessageLocal)
-
-            // Shared
-            .IfSuccess(LogSteps.LogContext);
-
-        public static WorkflowPlanner<int, Error> Plan2 => static ctx => ctx
-            .Execute(c => Console.WriteLine("Integer was : {0}", c.Data));
     }
 
     public async Task StartAsync()
@@ -77,37 +38,58 @@ public class Demo(
             .Build();
 
         // Or initiate the context using an injected WorkflowContextBuilder
-        var (data, result) = await workflowContextBuilder
+        var (data, state) = await workflowContextBuilder
             .WithError<Error>()
             .WithData(new Context
             {
-                Parity = Parity.Odd,
+                Parity = Parity.Pair,
             })
             .Build()
 
-            .Execute(Planner.Plan);
+            // Shared
+            .Execute(LogSteps.LogContext)
 
-        var message = result
+            // This method always returns an error WorkflowState<string>
+            //.IfSuccess(ctx => ErrorSteps.IWillFailSaying(ctx, "Sorry, i had to fail...").Map(Error.From))
+
+            // This method can thow, so ExecuteTry is required and Error must implement IFromException<Error>
+            .ExecuteTry(CanThrow)
+
+            // Local
+            .IfSuccess(GetDateLocal)
+
+            // Shared
+            .IfSuccess(TimeSteps.GetDate)
+            .IfSuccess(LogSteps.LogContext)
+
+            // Local
+            // This method can thow, so IfSuccessTry is required and Error must implement IFromException<Error>
+            .IfSuccessTry(GetMessageLocal)
+
+            // Shared
+            .IfSuccess(LogSteps.LogContext);
+
+        var message = await state
             .Match(
-                onSuccess: () => data.Message,
-                onFailure: error => error.Message);
+                onSuccess: () => Task.FromResult(data.Message!),
+                onFailure: error => Task.FromResult(error.Message));
 
         Console.WriteLine(message);
     }
 
-    static async Task<WorkflowResult<Error>> GetDateLocal(WorkflowContext<Context, Error> ctx)
+    static async Task<WorkflowState<Error>> GetDateLocal(WorkflowContext<Context, Error> ctx)
     {
         // Fake I/O call to demonstrate that steps can be asynchronous at any point
         await Task.CompletedTask;
 
         ctx.Data.Date = DateTime.Now;
 
-        return WorkflowResult.Success<Error>();
+        return WorkflowState.Success();
     }
 
-    static WorkflowResult<Error> GetMessageLocal(WorkflowContext<Context, Error> ctx)
+    static WorkflowState<Error> GetMessageLocal(WorkflowContext<Context, Error> ctx)
     {
-        var parity = ctx.Data.Parity == Parity.Odd ? 1 : 0;
+        var parity = ctx.Data.Parity == Parity.Odd ? 0 : 1;
 
         if (ctx.Data.Date!.Value.Second % 2 == parity)
         {
@@ -118,15 +100,17 @@ public class Demo(
 
         ctx.Data.Message = $"The date is {ctx.Data.Date.Value:G}.";
 
-        return WorkflowResult.Success<Error>();
+        return WorkflowState.Success();
     }
 
-    static void CanThrow(WorkflowContext<Context, Error> ctx)
+    static WorkflowState<Error> CanThrow(WorkflowContext<Context, Error> ctx)
     {
         if (Random.Shared.NextSingle() > 0.9)
         {
             throw new UnfortunateException();
         }
+
+        return WorkflowState.Success();
     }
 
     class UnfortunateException() : Exception("That's unfortunate.");

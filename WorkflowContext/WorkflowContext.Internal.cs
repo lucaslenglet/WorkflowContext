@@ -8,7 +8,7 @@ public static partial class WorkflowContext
     internal static WorkflowContext<TData, TError> IfSuccessDoInternal<TData, TError>(
         this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, WorkflowContext<TData, TError>> action)
     {
-        if (context.Result.IsFailure)
+        if (context.State.IsFailure)
         {
             return context;
         }
@@ -25,7 +25,7 @@ public static partial class WorkflowContext
     internal static async Task<WorkflowContext<TData, TError>> IfSuccessDoInternal<TData, TError>(
         this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, Task<WorkflowContext<TData, TError>>> action)
     {
-        if (context.Result.IsFailure)
+        if (context.State.IsFailure)
         {
             return context;
         }
