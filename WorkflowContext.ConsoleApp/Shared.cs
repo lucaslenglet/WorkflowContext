@@ -6,7 +6,7 @@ namespace WorkflowContext.ConsoleApp;
 
 static class TimeSteps
 {
-    public static async Task GetDate<TData, TError>(WorkflowContext<TData, TError> context)
+    public static async Task<WorkflowState<TError>> GetDate<TData, TError>(WorkflowContext<TData, TError> context)
         where TData : IDate
     {
         // Fake I/O call to demonstrate that steps can be asynchronous at any point
@@ -15,6 +15,8 @@ static class TimeSteps
         var timeProvider = context.Services.GetRequiredService<TimeProvider>();
 
         context.Data.Date = timeProvider.GetLocalNow().DateTime;
+
+        return WorkflowState.Success();
     }
 
     public interface IDate
@@ -25,20 +27,20 @@ static class TimeSteps
 
 static class LogSteps
 {
-    public static void LogContext<TData, TError>(WorkflowContext<TData, TError> context)
+    public static WorkflowState<TError> LogContext<TData, TError>(WorkflowContext<TData, TError> context)
     {
         var logger = context.Services.GetRequiredService<ILogger<WorkflowContext<TData, TError>>>();
-        var scopedService = context.Services.GetRequiredService<ScopedService>();
 
         var json = JsonSerializer.Serialize(context);
 
-        logger.LogInformation("Scope : {ScopedId}, Context: {Context}",
-            scopedService.ScopeId, json);
+        logger.LogInformation("Context: {Context}", json);
+
+        return WorkflowState.Success();
     }
 }
 
 static class ErrorSteps
 {
-    public static WorkflowResult<string> IWillFailSaying<TData, TError>(WorkflowContext<TData, TError> context, string message) =>
-        WorkflowResult.Failure(message);
+    public static WorkflowState<string> IWillFailSaying<TData, TError>(WorkflowContext<TData, TError> context, string message) =>
+        WorkflowState.Failure(message);
 }

@@ -3,25 +3,25 @@ using System.Text.Json.Serialization;
 
 namespace WorkflowContext;
 
-public partial class WorkflowContext<TData, TError>(IServiceProvider serviceProvider, TData data)
+public class WorkflowContext<TData, TError>(IServiceProvider serviceProvider, TData data)
 {
     [JsonIgnore]
-    public IServiceProvider Services { get; internal set; } = serviceProvider;
+    public IServiceProvider Services { get; private init; } = serviceProvider;
 
     [JsonIgnore]
-    public WorkflowResult<TError> Result { get; internal set; } = WorkflowResult.Success<TError>();
+    public WorkflowState<TError> State { get; internal set; } = WorkflowState.Success<TError>();
 
     public TData Data { get; } = data;
 
-    public void Deconstruct(out TData data, out WorkflowResult<TError> result)
+    public void Deconstruct(out TData data, out WorkflowState<TError> state)
     {
         data = Data;
-        result = Result;
+        state = State;
     }
 
-    public void Deconstruct(out TData data, out WorkflowResult<TError> result, out IServiceProvider serviceProvider)
+    public void Deconstruct(out TData data, out WorkflowState<TError> state, out IServiceProvider serviceProvider)
     {
-        Deconstruct(out data, out result);
+        Deconstruct(out data, out state);
         serviceProvider = Services;
     }
 }
