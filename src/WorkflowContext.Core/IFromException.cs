@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WorkflowContext;
+namespace WorkflowContext.Core;
 
 public interface IFromException<TSelf> : IFrom<Exception, TSelf>
     where TSelf : IFrom<Exception, TSelf>;

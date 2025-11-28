@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WorkflowContext\WorkflowContext.csproj" />
+    <ProjectReference Include="..\..\src\WorkflowContext.Core\WorkflowContext.Core.csproj" />
   </ItemGroup>
 
 </Project>

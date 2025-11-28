@@ -1,4 +1,6 @@
-﻿namespace WorkflowContext.ConsoleApp;
+﻿using WorkflowContext.Core;
+
+namespace DemoApp;
 
 public class Demo(
     IServiceProvider serviceProvider,

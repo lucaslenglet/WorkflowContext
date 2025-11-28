@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace WorkflowContext;
+namespace WorkflowContext.Core;
 
 public static class DependencyInjection
 {

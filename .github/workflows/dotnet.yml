@@ -1,0 +1,26 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: [ '10.0.x' ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Restore
+        run: dotnet restore WorkflowContext.slnx
+      - name: Build solution
+        run: dotnet build WorkflowContext.slnx --configuration Release --no-restore
+      - name: Test
+        run: dotnet test --no-build --verbosity normal

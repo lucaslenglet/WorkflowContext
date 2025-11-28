@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace WorkflowContext;
+namespace WorkflowContext.Core;
 
 public class WorkflowContext<TData, TError>(IServiceProvider serviceProvider, TData data)
 {

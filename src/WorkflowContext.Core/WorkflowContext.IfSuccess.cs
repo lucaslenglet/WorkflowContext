@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace WorkflowContext;
+namespace WorkflowContext.Core;
 
 public static partial class WorkflowContext
 {
