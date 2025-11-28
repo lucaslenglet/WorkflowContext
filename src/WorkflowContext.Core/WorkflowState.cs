@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WorkflowContext;
+namespace WorkflowContext.Core;
 
 public static class WorkflowState
 {
@@ -11,16 +11,10 @@ public static class WorkflowState
 
 public readonly struct SuccessWorkflowState;
 
-public readonly struct WorkflowState<TError>
+public readonly struct WorkflowState<TError>(TError error)
 {
-    public WorkflowState(TError error)
-    {
-        Error = error;
-        IsFailure = true;
-    }
-
-    public TError Error { get; }
-    public bool IsFailure { get; } = false;
+    public TError Error { get; } = error;
+    public bool IsFailure { get; } = true;
     public bool IsSuccess => !IsFailure;
 
     public static implicit operator WorkflowState<TError>(TError error) =>

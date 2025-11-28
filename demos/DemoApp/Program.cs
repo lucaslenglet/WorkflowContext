@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DemoApp;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using WorkflowContext;
-using WorkflowContext.ConsoleApp;
+using WorkflowContext.Core;
 
 await new ServiceCollection()
 

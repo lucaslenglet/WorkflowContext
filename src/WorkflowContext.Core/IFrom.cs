@@ -1,4 +1,4 @@
-﻿namespace WorkflowContext;
+﻿namespace WorkflowContext.Core;
 
 // Mimic Rust's From trait behavior (https://doc.rust-lang.org/std/convert/trait.From.html)
 public interface IFrom<TFrom, TSelf>

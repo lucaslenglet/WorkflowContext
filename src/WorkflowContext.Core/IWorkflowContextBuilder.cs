@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WorkflowContext;
+namespace WorkflowContext.Core;
 
 public interface IWorkflowContextBuilder
 {

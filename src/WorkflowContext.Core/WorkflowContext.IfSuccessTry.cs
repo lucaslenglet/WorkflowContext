@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace WorkflowContext;
+namespace WorkflowContext.Core;
 
 public static partial class WorkflowContext
 {
@@ -20,7 +20,7 @@ public static partial class WorkflowContext
             return context.IfSuccessDoInternal(ctx => ctx.ExecuteTry(step));
         }
     }
-    
+
     extension<TData, TError>(Task<WorkflowContext<TData, TError>> context)
         where TError : IFromException<TError>
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace WorkflowContext;
+namespace WorkflowContext.Core;
 
 public static partial class WorkflowContext
 {
@@ -19,7 +19,7 @@ public static partial class WorkflowContext
         {
             context.State = await step(context);
             return context;
-        } 
+        }
     }
 
     extension<TData, TError>(Task<WorkflowContext<TData, TError>> context)
@@ -34,6 +34,6 @@ public static partial class WorkflowContext
             Func<WorkflowContext<TData, TError>, Task<WorkflowState<TError>>> step)
         {
             return await (await context).Execute(step);
-        }  
+        }
     }
 }

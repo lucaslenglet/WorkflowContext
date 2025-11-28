@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Authors>LENGLET Lucas</Authors>
+    <Description>Lightweight helpers for building workflow contexts and execution pipelines.</Description>
+    <PackageTags>workflow;pipeline;context</PackageTags>
+    <RepositoryUrl>https://github.com/lucaslenglet/WorkflowContext</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/lucaslenglet/WorkflowContext</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+  </ItemGroup>
+
+</Project>
