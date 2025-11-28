@@ -5,31 +5,35 @@ namespace WorkflowContext;
 
 public static partial class WorkflowContext
 {
-    public static WorkflowContext<TData, TError> IfSuccessTry<TData, TError>(
-        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, WorkflowState<TError>> step)
+    extension<TData, TError>(WorkflowContext<TData, TError> context)
         where TError : IFromException<TError>
     {
-        return context.IfSuccessDoInternal(ctx => ctx.ExecuteTry(step));
-    }
+        public WorkflowContext<TData, TError> IfSuccessTry(
+            Func<WorkflowContext<TData, TError>, WorkflowState<TError>> step)
+        {
+            return context.IfSuccessDoInternal(ctx => ctx.ExecuteTry(step));
+        }
 
-    public static Task<WorkflowContext<TData, TError>> IfSuccessTry<TData, TError>(
-        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, WorkflowState<TError>> step)
-        where TError : IFromException<TError>
-    {
-        return context.IfSuccessDoInternal(ctx => ctx.ExecuteTry(step));
+        public Task<WorkflowContext<TData, TError>> IfSuccessTry(
+            Func<WorkflowContext<TData, TError>, Task<WorkflowState<TError>>> step)
+        {
+            return context.IfSuccessDoInternal(ctx => ctx.ExecuteTry(step));
+        }
     }
-
-    public static Task<WorkflowContext<TData, TError>> IfSuccessTry<TData, TError>(
-        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, Task<WorkflowState<TError>>> step)
+    
+    extension<TData, TError>(Task<WorkflowContext<TData, TError>> context)
         where TError : IFromException<TError>
     {
-        return context.IfSuccessDoInternal(ctx => ctx.ExecuteTry(step));
-    }
+        public Task<WorkflowContext<TData, TError>> IfSuccessTry(
+            Func<WorkflowContext<TData, TError>, WorkflowState<TError>> step)
+        {
+            return context.IfSuccessDoInternal(ctx => ctx.ExecuteTry(step));
+        }
 
-    public static Task<WorkflowContext<TData, TError>> IfSuccessTry<TData, TError>(
-        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task<WorkflowState<TError>>> step)
-        where TError : IFromException<TError>
-    {
-        return context.IfSuccessDoInternal(ctx => ctx.ExecuteTry(step));
+        public Task<WorkflowContext<TData, TError>> IfSuccessTry(
+            Func<WorkflowContext<TData, TError>, Task<WorkflowState<TError>>> step)
+        {
+            return context.IfSuccessDoInternal(ctx => ctx.ExecuteTry(step));
+        }
     }
 }

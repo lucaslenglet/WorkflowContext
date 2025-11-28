@@ -5,37 +5,43 @@ namespace WorkflowContext;
 
 public static partial class WorkflowContext
 {
-    internal static WorkflowContext<TData, TError> IfSuccessDoInternal<TData, TError>(
-        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, WorkflowContext<TData, TError>> action)
+    extension<TData, TError>(WorkflowContext<TData, TError> context)
     {
-        if (context.State.IsFailure)
+        internal WorkflowContext<TData, TError> IfSuccessDoInternal(
+            Func<WorkflowContext<TData, TError>, WorkflowContext<TData, TError>> action)
         {
-            return context;
+            if (context.State.IsFailure)
+            {
+                return context;
+            }
+
+            return action(context);
         }
 
-        return action(context);
-    }
-
-    internal static async Task<WorkflowContext<TData, TError>> IfSuccessDoInternal<TData, TError>(
-        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, WorkflowContext<TData, TError>> action)
-    {
-        return (await context).IfSuccessDoInternal(action);
-    }
-
-    internal static async Task<WorkflowContext<TData, TError>> IfSuccessDoInternal<TData, TError>(
-        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, Task<WorkflowContext<TData, TError>>> action)
-    {
-        if (context.State.IsFailure)
+        internal async Task<WorkflowContext<TData, TError>> IfSuccessDoInternal(
+            Func<WorkflowContext<TData, TError>, Task<WorkflowContext<TData, TError>>> action)
         {
-            return context;
+            if (context.State.IsFailure)
+            {
+                return context;
+            }
+
+            return await action(context);
+        }
+    }
+
+    extension<TData, TError>(Task<WorkflowContext<TData, TError>> context)
+    {
+        internal async Task<WorkflowContext<TData, TError>> IfSuccessDoInternal(
+            Func<WorkflowContext<TData, TError>, WorkflowContext<TData, TError>> action)
+        {
+            return (await context).IfSuccessDoInternal(action);
         }
 
-        return await action(context);
-    }
-
-    internal static async Task<WorkflowContext<TData, TError>> IfSuccessDoInternal<TData, TError>(
-        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task<WorkflowContext<TData, TError>>> action)
-    {
-        return await (await context).IfSuccessDoInternal(action);
+        internal async Task<WorkflowContext<TData, TError>> IfSuccessDoInternal(
+            Func<WorkflowContext<TData, TError>, Task<WorkflowContext<TData, TError>>> action)
+        {
+            return await (await context).IfSuccessDoInternal(action);
+        }
     }
 }
