@@ -5,49 +5,53 @@ namespace WorkflowContext;
 
 public static partial class WorkflowContext
 {
-    public static WorkflowContext<TData, TError> ExecuteTry<TData, TError>(
-        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, WorkflowState<TError>> step)
+    extension<TData, TError>(WorkflowContext<TData, TError> context)
         where TError : IFromException<TError>
     {
-        try
+        public WorkflowContext<TData, TError> ExecuteTry(
+            Func<WorkflowContext<TData, TError>, WorkflowState<TError>> step)
         {
-            context.State = step(context);
-        }
-        catch (Exception ex)
-        {
-            context.State = TError.From(ex);
+            try
+            {
+                context.State = step(context);
+            }
+            catch (Exception ex)
+            {
+                context.State = TError.From(ex);
+            }
+
+            return context;
         }
 
-        return context;
+        public async Task<WorkflowContext<TData, TError>> ExecuteTry(
+            Func<WorkflowContext<TData, TError>, Task<WorkflowState<TError>>> step)
+        {
+            try
+            {
+                context.State = await step(context);
+            }
+            catch (Exception ex)
+            {
+                context.State = TError.From(ex);
+            }
+
+            return context;
+        }
     }
 
-    public static async Task<WorkflowContext<TData, TError>> ExecuteTry<TData, TError>(
-        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, WorkflowState<TError>> step)
+    extension<TData, TError>(Task<WorkflowContext<TData, TError>> context)
         where TError : IFromException<TError>
     {
-        return (await context).ExecuteTry(step);
-    }
-
-    public static async Task<WorkflowContext<TData, TError>> ExecuteTry<TData, TError>(
-        this WorkflowContext<TData, TError> context, Func<WorkflowContext<TData, TError>, Task<WorkflowState<TError>>> step)
-        where TError : IFromException<TError>
-    {
-        try
+        public async Task<WorkflowContext<TData, TError>> ExecuteTry(
+            Func<WorkflowContext<TData, TError>, WorkflowState<TError>> step)
         {
-            context.State = await step(context);
-        }
-        catch (Exception ex)
-        {
-            context.State = TError.From(ex);
+            return (await context).ExecuteTry(step);
         }
 
-        return context;
-    }
-
-    public static async Task<WorkflowContext<TData, TError>> ExecuteTry<TData, TError>(
-        this Task<WorkflowContext<TData, TError>> context, Func<WorkflowContext<TData, TError>, Task<WorkflowState<TError>>> step)
-        where TError : IFromException<TError>
-    {
-        return await (await context).ExecuteTry(step);
+        public async Task<WorkflowContext<TData, TError>> ExecuteTry(
+            Func<WorkflowContext<TData, TError>, Task<WorkflowState<TError>>> step)
+        {
+            return await (await context).ExecuteTry(step);
+        }
     }
 }
