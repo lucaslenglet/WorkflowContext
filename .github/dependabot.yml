@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      nuget:
+        patterns: ["*"]
+    ignore:
+      # Pinned on purpose to the lowest version the library needs, so consumers stay free to bring a newer one.
+      - dependency-name: Microsoft.Extensions.DependencyInjection.Abstractions
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]

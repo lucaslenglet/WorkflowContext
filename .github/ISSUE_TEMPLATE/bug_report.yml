@@ -1,0 +1,44 @@
+name: Bug report
+description: Report a behaviour of the library that does not match its documentation.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Issues are read, but no response, fix or timeline is guaranteed, and pull requests are not accepted.
+        See [CONTRIBUTING.md](https://github.com/lucaslenglet/WorkflowContext/blob/main/CONTRIBUTING.md).
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: .NET version
+      placeholder: net10.0
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Code to reproduce
+      description: The smallest pipeline that shows the problem.
+      render: csharp
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include the exception and its stack trace, if any.
+    validations:
+      required: true

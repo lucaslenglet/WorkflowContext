@@ -1,0 +1,20 @@
+<Project>
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Single source of truth for the package version. The release workflow overrides it from the git tag. -->
+    <WorkflowContextVersion Condition="'$(WorkflowContextVersion)' == ''">0.1.0-local.1</WorkflowContextVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <!-- Normalizes paths embedded in PDBs, so the published package is reproducible. -->
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+</Project>

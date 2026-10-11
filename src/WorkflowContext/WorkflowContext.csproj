@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <RootNamespace>WorkflowContext</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>lucaslgt.WorkflowContext</PackageId>
+    <Version>$(WorkflowContextVersion)</Version>
+    <Authors>Lucas Lenglet</Authors>
+    <Description>Lightweight helpers for building workflow contexts and execution pipelines.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT-0</PackageLicenseExpression>
+    <PackageTags>workflow;pipeline;context;railway</PackageTags>
+    <PackageProjectUrl>https://github.com/lucaslenglet/WorkflowContext</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/lucaslenglet/WorkflowContext</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <!-- Symbols go to a separate .snupkg; Source Link (built into the SDK) lets debuggers fetch the sources. -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
